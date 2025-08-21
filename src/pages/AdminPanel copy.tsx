@@ -294,24 +294,7 @@ export function AdminPanel() {
 
   const handlePriceUpdate = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Show immediate feedback
-    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
-    if (submitButton) {
-      submitButton.textContent = 'Sincronizando...';
-      submitButton.disabled = true;
-    }
-    
-    // Update prices with real-time sync
     updatePrices(priceForm);
-    
-    // Reset button after sync
-    setTimeout(() => {
-      if (submitButton) {
-        submitButton.textContent = 'Guardar Precios';
-        submitButton.disabled = false;
-      }
-    }, 1000);
   };
 
   const handleAddZone = (e: React.FormEvent) => {
@@ -358,99 +341,33 @@ export function AdminPanel() {
 
   const renderDashboard = () => (
     <div className="space-y-8">
-      {/* Real-time sync status */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 border-2 border-green-200">
-        <div className="flex items-center mb-4">
-          <div className="bg-green-100 p-3 rounded-xl mr-4">
-            <div className="w-6 h-6 bg-green-500 rounded-full animate-pulse"></div>
-          </div>
-          <h3 className="text-xl font-bold text-green-900">Estado de Sincronización en Tiempo Real</h3>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className={`p-4 rounded-xl border-2 ${state.syncStatus.prices ? 'border-green-300 bg-green-50' : 'border-orange-300 bg-orange-50'}`}>
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-gray-900">Precios</span>
-              <div className={`w-3 h-3 rounded-full ${state.syncStatus.prices ? 'bg-green-500 animate-pulse' : 'bg-orange-500'}`}></div>
-            </div>
-            <p className="text-xs text-gray-600 mt-1">
-              {state.lastPriceUpdate ? `Actualizado: ${new Date(state.lastPriceUpdate).toLocaleTimeString('es-ES')}` : 'Sin actualizaciones'}
-            </p>
-          </div>
-          
-          <div className={`p-4 rounded-xl border-2 ${state.syncStatus.zones ? 'border-green-300 bg-green-50' : 'border-orange-300 bg-orange-50'}`}>
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-gray-900">Zonas</span>
-              <div className={`w-3 h-3 rounded-full ${state.syncStatus.zones ? 'bg-green-500 animate-pulse' : 'bg-orange-500'}`}></div>
-            </div>
-            <p className="text-xs text-gray-600 mt-1">
-              {state.lastZoneUpdate ? `Actualizado: ${new Date(state.lastZoneUpdate).toLocaleTimeString('es-ES')}` : 'Sin actualizaciones'}
-            </p>
-          </div>
-          
-          <div className={`p-4 rounded-xl border-2 ${state.syncStatus.novels ? 'border-green-300 bg-green-50' : 'border-orange-300 bg-orange-50'}`}>
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-gray-900">Novelas</span>
-              <div className={`w-3 h-3 rounded-full ${state.syncStatus.novels ? 'bg-green-500 animate-pulse' : 'bg-orange-500'}`}></div>
-            </div>
-            <p className="text-xs text-gray-600 mt-1">
-              {state.lastNovelUpdate ? `Actualizado: ${new Date(state.lastNovelUpdate).toLocaleTimeString('es-ES')}` : 'Sin actualizaciones'}
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Estadísticas principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-xl relative">
-          {state.lastZoneUpdate && (
-            <div className="absolute top-2 right-2 bg-green-400 text-green-900 text-xs px-2 py-1 rounded-full animate-pulse">
-              Sync
-            </div>
-          )}
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm font-medium">Zonas de Entrega</p>
               <p className="text-3xl font-bold">{state.deliveryZones.length}</p>
-              <p className="text-xs text-blue-200 mt-1">
-                {state.deliveryZones.filter(z => z.active).length} activas
-              </p>
             </div>
             <MapPin className="h-12 w-12 text-blue-200" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl relative">
-          {state.lastNovelUpdate && (
-            <div className="absolute top-2 right-2 bg-green-400 text-green-900 text-xs px-2 py-1 rounded-full animate-pulse">
-              Sync
-            </div>
-          )}
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100 text-sm font-medium">Novelas</p>
               <p className="text-3xl font-bold">{state.novels.length}</p>
-              <p className="text-xs text-purple-200 mt-1">
-                {state.novels.filter(n => n.active).length} activas
-              </p>
             </div>
             <BookOpen className="h-12 w-12 text-purple-200" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-xl relative">
-          {state.lastPriceUpdate && (
-            <div className="absolute top-2 right-2 bg-green-400 text-green-900 text-xs px-2 py-1 rounded-full animate-pulse">
-              Sync
-            </div>
-          )}
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm font-medium">Precio Película</p>
               <p className="text-3xl font-bold">${state.prices.moviePrice}</p>
-              <p className="text-xs text-green-200 mt-1">
-                Transferencia: {state.prices.transferFeePercentage}%
-              </p>
             </div>
             <DollarSign className="h-12 w-12 text-green-200" />
           </div>
@@ -461,13 +378,6 @@ export function AdminPanel() {
             <div>
               <p className="text-orange-100 text-sm font-medium">Notificaciones</p>
               <p className="text-3xl font-bold">{state.notifications.length}</p>
-              <p className="text-xs text-orange-200 mt-1">
-                Últimas 24h: {state.notifications.filter(n => {
-                  const notifTime = new Date(n.timestamp);
-                  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                  return notifTime > dayAgo;
-                }).length}
-              </p>
             </div>
             <Bell className="h-12 w-12 text-orange-200" />
           </div>
@@ -480,9 +390,6 @@ export function AdminPanel() {
           <h3 className="text-xl font-bold text-gray-900 flex items-center">
             <Activity className="mr-3 h-6 w-6 text-blue-600" />
             Actividad Reciente
-            <div className="ml-auto bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-              Tiempo Real
-            </div>
           </h3>
         </div>
         <div className="p-6">
