@@ -175,8 +175,8 @@ export function Cart() {
                             }`}
                           >
                             <CreditCard className="h-3 w-3 inline mr-1" />
-                            Transferencia (+10%)
-                          </button>
+                            Transferencia (+{transferFeePercentage}%)
+                          {state.items.filter(item => item.paymentType === 'transfer').length} elementos (+{adminContext?.state?.prices?.transferFeePercentage || 10}%)
                         </div>
                       </div>
                     </div>
@@ -205,7 +205,7 @@ export function Cart() {
                       {item.type === 'tv' && item.selectedSeasons && item.selectedSeasons.length > 0 && (
                         <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-medium inline-flex items-center">
                           <Tv className="h-3 w-3 mr-1" />
-                          {item.selectedSeasons.length} temp.
+                          Incluye ${totals.transferFee.toLocaleString()} CUP de recargo por transferencia ({adminContext?.state?.prices?.transferFeePercentage || 10}%)
                         </span>
                       )}
                       <div className="inline-flex items-center">
@@ -366,7 +366,7 @@ export function Cart() {
                         </p>
                         {item.paymentType === 'transfer' && (
                           <p className="text-xs text-gray-500">
-                            Base: ${basePrice.toLocaleString()} CUP
+                            Base: ${basePrice.toLocaleString()} CUP (+{adminContext?.state?.prices?.transferFeePercentage || 10}%)
                           </p>
                         )}
                         {item.type === 'tv' && item.selectedSeasons && item.selectedSeasons.length > 0 && (
