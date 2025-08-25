@@ -121,10 +121,79 @@ function adminReducer(state: AdminState, action: AdminAction): AdminState {
 export const AdminContext = createContext<{
   state: AdminState;
   dispatch: React.Dispatch<AdminAction>;
+  login: () => void;
+  logout: () => void;
+  updatePrices: (prices: PriceConfig) => void;
+  addDeliveryZone: (zone: Omit<DeliveryZone, 'id' | 'createdAt'>) => void;
+  updateDeliveryZone: (zone: DeliveryZone) => void;
+  deleteDeliveryZone: (id: number) => void;
+  addNovel: (novel: Omit<Novel, 'id'>) => void;
+  updateNovel: (novel: Novel) => void;
+  deleteNovel: (id: number) => void;
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
+  removeNotification: (id: string) => void;
 } | null>(null);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
+
+  const login = () => {
+    dispatch({ type: 'LOGIN' });
+  };
+
+  const logout = () => {
+    dispatch({ type: 'LOGOUT' });
+  };
+
+  const updatePrices = (prices: PriceConfig) => {
+    dispatch({ type: 'UPDATE_PRICES', payload: prices });
+  };
+
+  const addDeliveryZone = (zoneData: Omit<DeliveryZone, 'id' | 'createdAt'>) => {
+    const newZone: DeliveryZone = {
+      ...zoneData,
+      id: Date.now(),
+      createdAt: new Date().toISOString()
+    };
+    dispatch({ type: 'ADD_DELIVERY_ZONE', payload: newZone });
+  };
+
+  const updateDeliveryZone = (zone: DeliveryZone) => {
+    dispatch({ type: 'UPDATE_DELIVERY_ZONE', payload: zone });
+  };
+
+  const deleteDeliveryZone = (id: number) => {
+    dispatch({ type: 'DELETE_DELIVERY_ZONE', payload: id });
+  };
+
+  const addNovel = (novelData: Omit<Novel, 'id'>) => {
+    const newNovel: Novel = {
+      ...novelData,
+      id: Date.now()
+    };
+    dispatch({ type: 'ADD_NOVEL', payload: newNovel });
+  };
+
+  const updateNovel = (novel: Novel) => {
+    dispatch({ type: 'UPDATE_NOVEL', payload: novel });
+  };
+
+  const deleteNovel = (id: number) => {
+    dispatch({ type: 'DELETE_NOVEL', payload: id });
+  };
+
+  const addNotification = (notificationData: Omit<Notification, 'id' | 'timestamp'>) => {
+    const newNotification: Notification = {
+      ...notificationData,
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString()
+    };
+    dispatch({ type: 'ADD_NOTIFICATION', payload: newNotification });
+  };
+
+  const removeNotification = (id: string) => {
+    dispatch({ type: 'REMOVE_NOTIFICATION', payload: id });
+  };
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -162,7 +231,21 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [state.prices, state.deliveryZones, state.novels]);
 
   return (
-    <AdminContext.Provider value={{ state, dispatch }}>
+    <AdminContext.Provider value={{ 
+      state, 
+      dispatch,
+      login,
+      logout,
+      updatePrices,
+      addDeliveryZone,
+      updateDeliveryZone,
+      deleteDeliveryZone,
+      addNovel,
+      updateNovel,
+      deleteNovel,
+      addNotification,
+      removeNotification
+    }}>
       {children}
     </AdminContext.Provider>
   );
