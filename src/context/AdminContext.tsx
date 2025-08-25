@@ -118,7 +118,7 @@ function adminReducer(state: AdminState, action: AdminAction): AdminState {
   }
 }
 
-const AdminContext = createContext<{
+export const AdminContext = createContext<{
   state: AdminState;
   dispatch: React.Dispatch<AdminAction>;
 } | null>(null);
