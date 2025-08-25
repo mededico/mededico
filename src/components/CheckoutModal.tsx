@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { X, User, MapPin, Phone, Copy, Check, MessageCircle, Calculator, DollarSign, CreditCard } from 'lucide-react';
 import { AdminContext } from '../context/AdminContext';
 
+// Base delivery zones with default option
+const BASE_DELIVERY_ZONES = {
+  'Por favor seleccionar su Barrio/Zona': 0,
+};
+
 export interface CustomerInfo {
   fullName: string;
   phone: string;
