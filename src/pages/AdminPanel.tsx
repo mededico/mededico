@@ -774,45 +774,95 @@ export function AdminPanel() {
           <h4 className="text-lg font-bold text-gray-900">Novelas Configuradas ({state.novels.length})</h4>
         </div>
         <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-          {state.novels.map((novel) => (
-            <div key={novel.id} className="p-6 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h5 className="font-semibold text-gray-900">{novel.titulo}</h5>
-                  <p className="text-gray-600 text-sm mt-1">
-                    {novel.genero} • {novel.capitulos} capítulos • {novel.año}
-                  </p>
-                  {novel.descripcion && (
-                    <p className="text-gray-500 text-sm mt-2 line-clamp-2">{novel.descripcion}</p>
-                  )}
-                  <div className="flex items-center mt-2 space-x-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      novel.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {novel.active ? 'Activa' : 'Inactiva'}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      Costo: ${(novel.capitulos * state.prices.novelPricePerChapter).toLocaleString()} CUP
-                    </span>
+          {state.novels.map((novel) => {
+            const isSelected = false; // Placeholder for selection logic
+            const baseCost = novel.capitulos * state.prices.novelPricePerChapter;
+            const transferCost = Math.round(baseCost * (1 + state.prices.transferFeePercentage / 100));
+            const finalCost = novel.paymentType === 'transfer' ? transferCost : baseCost;
+
+            return (
+              <div
+                key={novel.id}
+                className={`p-6 hover:bg-gray-50 transition-colors`}
+              >
+                <div className="flex items-start space-x-4">
+                  {/* Remove checkbox for now */}
+                  
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between space-y-3 sm:space-y-0">
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 mb-2">{novel.titulo}</p>
+                        <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-3">
+                          <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                            {novel.genero}
+                          </span>
+                          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                            {novel.capitulos} capítulos
+                          </span>
+                          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                            {novel.año}
+                          </span>
+                        </div>
+                        
+                        {/* Payment type selector */}
+                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                          <span className="text-sm font-medium text-gray-700">Tipo de pago:</span>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handlePaymentTypeChange(novel.id, 'cash')}
+                              className={`px-3 py-2 rounded-full text-xs font-medium transition-colors ${
+                                true // Default to cash for display
+                                  ? 'bg-green-500 text-white'
+                                  : 'bg-gray-200 text-gray-600 hover:bg-green-100'
+                              }`}
+                            >
+                              Efectivo
+                            </button>
+                            <button
+                              onClick={() => handlePaymentTypeChange(novel.id, 'transfer')}
+                              className={`px-3 py-2 rounded-full text-xs font-medium transition-colors ${
+                                false // Default to not transfer for display
+                                  ? 'bg-orange-500 text-white'
+                                  : 'bg-gray-200 text-gray-600 hover:bg-orange-100'
+                              }`}
+                            >
+                              Transferencia
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right sm:ml-4">
+                        <div className={`text-lg font-bold ${
+                          novel.paymentType === 'transfer' ? 'text-orange-600' : 'text-green-600'
+                        }`}>
+                          ${finalCost.toLocaleString()} CUP
+                        </div>
+                        {novel.paymentType === 'transfer' && (
+                          <div className="text-xs text-gray-500">
+                            Base: ${baseCost.toLocaleString()} CUP
+                            <br />
+                            Recargo: +${(transferCost - baseCost).toLocaleString()} CUP
+                          </div>
+                        )}
+                        <div className="flex items-center mt-2 space-x-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            novel.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {novel.active ? 'Activa' : 'Inactiva'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => startEditNovel(novel)}
-                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => deleteNovel(novel.id)}
-                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  
+                  {isSelected && (
+                    <Check className="h-5 w-5 text-purple-600 mt-1" />
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
