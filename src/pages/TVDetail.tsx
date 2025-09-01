@@ -340,6 +340,34 @@ export function TVDetail() {
               </div>
               
               <div className="p-6">
+              {/* Advertencia para series con muchos episodios */}
+              {tvShow.seasons.some(season => season.episode_count > 50) && (
+                <div className="mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border-2 border-yellow-300">
+                  <div className="flex items-center mb-3">
+                    <div className="bg-yellow-100 p-2 rounded-lg mr-3">
+                      <span className="text-lg">⚠️</span>
+                    </div>
+                    <h4 className="font-bold text-yellow-900">Información Importante</h4>
+                  </div>
+                  <div className="text-sm text-yellow-800 space-y-2">
+                    <p className="font-semibold">
+                      📺 Esta serie tiene temporadas con más de 50 capítulos
+                    </p>
+                    <p>
+                      💰 <strong>Hasta 50 capítulos:</strong> Se contempla como una temporada completa (${adminContext?.state?.prices?.seriesPrice || 300} CUP)
+                    </p>
+                    <p>
+                      📞 <strong>Más de 50 capítulos:</strong> Debe ponerse de acuerdo con TV a la Carta para más información sobre el costo adicional
+                    </p>
+                    <div className="mt-3 p-3 bg-white rounded-lg border border-yellow-200">
+                      <p className="text-xs text-yellow-700 font-medium">
+                        📱 Contacte al +5354690878 para consultar sobre temporadas extensas
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Season Selection */}
               {hasMultipleSeasons && (
                 <div className="mb-8">
@@ -402,10 +430,20 @@ export function TVDetail() {
                             <div className="flex-1">
                               <p className="font-semibold text-gray-900">
                                 {season.name}
+                                {season.episode_count > 50 && (
+                                  <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">
+                                    Consultar costo
+                                  </span>
+                                )}
                               </p>
                               <p className="text-sm text-gray-600 mt-1">
                                 {season.episode_count} episodios
                                 {season.air_date && ` • ${new Date(season.air_date).getFullYear()}`}
+                                {season.episode_count > 50 && (
+                                  <span className="block text-xs text-yellow-600 mt-1">
+                                    ⚠️ Más de 50 episodios - Contactar para precio especial
+                                  </span>
+                                )}
                               </p>
                             </div>
                           </label>
