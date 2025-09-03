@@ -3324,18 +3324,24 @@ export function HeroCarousel({ items }: HeroCarouselProps) {
           
           const trailers = videoData.results.filter(
             video => video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
-          );
+            console.warn(\\\`No videos available for \\\${isMovie ? 'movie' : 'tv'} \\\${item.id}\\\`);
           
           return { id: item.id, videos: trailers };
         } catch (error) {
-          console.error(\`Error loading videos for item \${item.id}:\`, error);
+          console.warn(\\\`Error loading videos for item \\\${item.id}:\\\`, error);
           return { id: item.id, videos: [] };
         }
       });
 
       const results = await Promise.all(videoPromises);
-      const videosMap = results.reduce((acc, { id, videos }) => {
-        acc[id] = videos;
+      const videosMap = results.reduce((acc, result) => {
+        if (result.status === 'fulfilled') {
+          const { id, videos } = result.value;
+          acc[id] = videos;
+        }
+          const { id, videos } = result.value;
+          acc[id] = videos;
+        }
         return acc;
       }, {} as { [key: number]: Video[] });
       
