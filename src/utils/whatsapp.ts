@@ -1,4 +1,5 @@
 import { OrderData, CustomerInfo } from '../components/CheckoutModal';
+import { AdminContext } from '../context/AdminContext';
 
 export function sendOrderToWhatsApp(orderData: OrderData): void {
   const { 
@@ -14,6 +15,9 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
     transferTotal = 0
   } = orderData;
 
+  // Obtener el porcentaje de transferencia dinámicamente
+  const transferFeePercentage = orderData.transferFeePercentage || 10;
+
   // Formatear lista de productos
   const itemsList = items
     .map(item => {
@@ -21,9 +25,8 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
         ? `\n  📺 Temporadas: ${item.selectedSeasons.sort((a, b) => a - b).join(', ')}` 
         : '';
       const itemType = item.type === 'movie' ? 'Película' : 'Serie';
-      const moviePrice = 80; // This should be dynamic in real implementation
-      const seriesPrice = 300; // This should be dynamic in real implementation
-      const transferFeePercentage = 10; // This should be dynamic in real implementation
+      const moviePrice = orderData.moviePrice || 80;
+      const seriesPrice = orderData.seriesPrice || 300;
       const basePrice = item.type === 'movie' ? moviePrice : (item.selectedSeasons?.length || 1) * seriesPrice;
       const finalPrice = item.paymentType === 'transfer' ? Math.round(basePrice * (1 + transferFeePercentage / 100)) : basePrice;
       const paymentTypeText = item.paymentType === 'transfer' ? `Transferencia (+${transferFeePercentage}%)` : 'Efectivo';
@@ -55,7 +58,7 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
   if (cashItems.length > 0) {
     message += `💵 *EFECTIVO:*\n`;
     cashItems.forEach(item => {
-      const basePrice = item.type === 'movie' ? moviePrice : (item.selectedSeasons?.length || 1) * seriesPrice;
+      const basePrice = item.type === 'movie' ? (orderData.moviePrice || 80) : (item.selectedSeasons?.length || 1) * (orderData.seriesPrice || 300);
       const emoji = item.type === 'movie' ? '🎬' : '📺';
       message += `  ${emoji} ${item.title}: $${basePrice.toLocaleString()} CUP\n`;
     });
@@ -65,7 +68,7 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
   if (transferItems.length > 0) {
     message += `🏦 *TRANSFERENCIA (+${transferFeePercentage}%):*\n`;
     transferItems.forEach(item => {
-      const basePrice = item.type === 'movie' ? moviePrice : (item.selectedSeasons?.length || 1) * seriesPrice;
+      const basePrice = item.type === 'movie' ? (orderData.moviePrice || 80) : (item.selectedSeasons?.length || 1) * (orderData.seriesPrice || 300);
       const finalPrice = Math.round(basePrice * (1 + transferFeePercentage / 100));
       const emoji = item.type === 'movie' ? '🎬' : '📺';
       message += `  ${emoji} ${item.title}: $${basePrice.toLocaleString()} → $${finalPrice.toLocaleString()} CUP\n`;

@@ -44,6 +44,9 @@ export interface OrderData {
   total: number;
   cashTotal?: number;
   transferTotal?: number;
+  transferFeePercentage?: number;
+  moviePrice?: number;
+  seriesPrice?: number;
 }
 
 interface CheckoutModalProps {
@@ -266,7 +269,10 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
         transferFee,
         total: finalTotal,
         cashTotal,
-        transferTotal
+        transferTotal,
+        transferFeePercentage: adminContext?.state?.prices?.transferFeePercentage || 10,
+        moviePrice: adminContext?.state?.prices?.moviePrice || 80,
+        seriesPrice: adminContext?.state?.prices?.seriesPrice || 300
       };
 
       await onCheckout(orderData);

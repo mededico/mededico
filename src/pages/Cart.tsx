@@ -28,7 +28,10 @@ export function Cart() {
       transferFee,
       total,
       cashTotal: totalsByPaymentType.cash,
-      transferTotal: totalsByPaymentType.transfer
+      transferTotal: totalsByPaymentType.transfer,
+      transferFeePercentage: adminContext?.state?.prices?.transferFeePercentage || 10,
+      moviePrice: adminContext?.state?.prices?.moviePrice || 80,
+      seriesPrice: adminContext?.state?.prices?.seriesPrice || 300
     };
     
     sendOrderToWhatsApp(completeOrderData);
