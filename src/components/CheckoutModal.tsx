@@ -2,7 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { X, User, Phone, MapPin, CreditCard, DollarSign, Truck, Home, MessageCircle, AlertCircle, Check } from 'lucide-react';
 
 // ZONAS DE ENTREGA EMBEBIDAS - Generadas automáticamente
-const EMBEDDED_DELIVERY_ZONES = [];
+const EMBEDDED_DELIVERY_ZONES = [
+  {
+    "name": "barca de oro",
+    "cost": 100,
+    "id": 1757492079585,
+    "createdAt": "2025-09-10T08:14:39.585Z",
+    "updatedAt": "2025-09-10T08:14:39.585Z"
+  }
+];
 
 export interface CustomerInfo {
   fullName: string;
@@ -48,46 +56,9 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Obtener zonas de entrega actuales del admin context
-  const getCurrentDeliveryZones = () => {
-    try {
-      const adminState = localStorage.getItem('admin_system_state');
-      if (adminState) {
-        const state = JSON.parse(adminState);
-        return state.deliveryZones || EMBEDDED_DELIVERY_ZONES;
-      }
-    } catch (error) {
-      console.warn('Error getting delivery zones:', error);
-    }
-    return EMBEDDED_DELIVERY_ZONES;
-  };
+  const deliveryZones = EMBEDDED_DELIVERY_ZONES;
+  const phoneNumber = '+5354690878';
 
-  const [deliveryZones, setDeliveryZones] = useState(getCurrentDeliveryZones());
-
-  // Escuchar cambios en las zonas de entrega
-  useEffect(() => {
-    const handleAdminChange = (event: CustomEvent) => {
-      if (event.detail.type === 'delivery_zone_add' || 
-          event.detail.type === 'delivery_zone_update' || 
-          event.detail.type === 'delivery_zone_delete') {
-        const updatedZones = getCurrentDeliveryZones();
-        setDeliveryZones(updatedZones);
-        
-        // Si la zona seleccionada fue eliminada, resetear
-        if (selectedZone && !updatedZones.find((z: any) => z.id === selectedZone.id)) {
-          setSelectedZone(null);
-        }
-      }
-    };
-
-    window.addEventListener('admin_state_change', handleAdminChange as EventListener);
-    
-    return () => {
-      window.removeEventListener('admin_state_change', handleAdminChange as EventListener);
-    };
-  }, [selectedZone]);
-
-  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setCustomerInfo({ fullName: '', phone: '', address: '' });
@@ -95,8 +66,6 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
       setSelectedZone(null);
       setErrors({});
       setIsSubmitting(false);
-      // Actualizar zonas al abrir el modal
-      setDeliveryZones(getCurrentDeliveryZones());
     }
   }, [isOpen]);
 
@@ -166,7 +135,6 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
-        {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Finalizar Pedido</h2>
@@ -181,7 +149,6 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
 
         <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Customer Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                 <User className="h-5 w-5 mr-2 text-blue-600" />
@@ -252,7 +219,6 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
               </div>
             </div>
 
-            {/* Delivery Options */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                 <Truck className="h-5 w-5 mr-2 text-blue-600" />
@@ -300,7 +266,6 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
                 </button>
               </div>
 
-              {/* Delivery Zones */}
               {deliveryType === 'delivery' && (
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">
@@ -334,7 +299,7 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
                               <p className="font-medium text-gray-900">{zone.name}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-bold text-blue-600">${zone.cost.toLocaleString()} CUP</p>
+                              <p className="font-bold text-blue-600">$${zone.cost.toLocaleString()} CUP</p>
                             </div>
                           </div>
                         </button>
@@ -352,14 +317,13 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
               )}
             </div>
 
-            {/* Order Summary */}
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <h3 className="text-lg font-semibold text-gray-900">Resumen del Pedido</h3>
               
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal ({items.length} elementos)</span>
-                  <span className="font-medium">${total.toLocaleString()} CUP</span>
+                  <span className="font-medium">$${total.toLocaleString()} CUP</span>
                 </div>
                 
                 <div className="flex justify-between">
@@ -374,13 +338,12 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
                 <div className="border-t pt-2">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-blue-600">${finalTotal.toLocaleString()} CUP</span>
+                    <span className="text-blue-600">$${finalTotal.toLocaleString()} CUP</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting || (deliveryType === 'delivery' && deliveryZones.length === 0)}

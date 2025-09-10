@@ -3,10 +3,10 @@ import { DollarSign, Tv, Film, Star, CreditCard } from 'lucide-react';
 
 // PRECIOS EMBEBIDOS - Generados automáticamente
 const EMBEDDED_PRICES = {
-  "moviePrice": 80,
-  "seriesPrice": 300,
-  "transferFeePercentage": 10,
-  "novelPricePerChapter": 5
+  "moviePrice": 90,
+  "seriesPrice": 800,
+  "transferFeePercentage": 50,
+  "novelPricePerChapter": 100
 };
 
 interface PriceCardProps {
@@ -17,30 +17,14 @@ interface PriceCardProps {
 }
 
 export function PriceCard({ type, selectedSeasons = [], episodeCount = 0, isAnime = false }: PriceCardProps) {
-  // Obtener precios actuales del admin context
-  const getCurrentPrices = () => {
-    try {
-      const adminState = localStorage.getItem('admin_system_state');
-      if (adminState) {
-        const state = JSON.parse(adminState);
-        return state.prices || EMBEDDED_PRICES;
-      }
-    } catch (error) {
-      console.warn('Error getting admin prices:', error);
-    }
-    return EMBEDDED_PRICES;
-  };
-
-  const currentPrices = getCurrentPrices();
-  const moviePrice = currentPrices.moviePrice;
-  const seriesPrice = currentPrices.seriesPrice;
-  const transferFeePercentage = currentPrices.transferFeePercentage;
+  const moviePrice = EMBEDDED_PRICES.moviePrice;
+  const seriesPrice = EMBEDDED_PRICES.seriesPrice;
+  const transferFeePercentage = EMBEDDED_PRICES.transferFeePercentage;
   
   const calculatePrice = () => {
     if (type === 'movie') {
       return moviePrice;
     } else {
-      // Series: dynamic price per season
       return selectedSeasons.length * seriesPrice;
     }
   };
@@ -61,22 +45,6 @@ export function PriceCard({ type, selectedSeasons = [], episodeCount = 0, isAnim
     }
     return isAnime ? 'Anime' : 'Serie';
   };
-
-  // Escuchar cambios en los precios
-  React.useEffect(() => {
-    const handleAdminChange = (event: CustomEvent) => {
-      if (event.detail.type === 'prices') {
-        // Forzar re-render cuando cambien los precios
-        window.dispatchEvent(new Event('price-update'));
-      }
-    };
-
-    window.addEventListener('admin_state_change', handleAdminChange as EventListener);
-    
-    return () => {
-      window.removeEventListener('admin_state_change', handleAdminChange as EventListener);
-    };
-  }, []);
 
   return (
     <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-6 border-2 border-green-300 shadow-xl transform hover:scale-105 transition-all duration-300">
@@ -101,7 +69,6 @@ export function PriceCard({ type, selectedSeasons = [], episodeCount = 0, isAnim
       </div>
       
       <div className="space-y-3">
-        {/* Cash Price */}
         <div className="bg-gradient-to-r from-white to-green-50 rounded-xl p-4 border-2 border-green-200 shadow-md hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-bold text-green-700 flex items-center">
@@ -111,12 +78,11 @@ export function PriceCard({ type, selectedSeasons = [], episodeCount = 0, isAnim
               Efectivo
             </span>
             <span className="text-xl font-black text-green-700">
-              ${price.toLocaleString()} CUP
+              $${price.toLocaleString()} CUP
             </span>
           </div>
         </div>
         
-        {/* Transfer Price */}
         <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border-2 border-orange-200 shadow-md hover:shadow-lg transition-all duration-300">
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-bold text-orange-700 flex items-center">
@@ -126,7 +92,7 @@ export function PriceCard({ type, selectedSeasons = [], episodeCount = 0, isAnim
               Transferencia
             </span>
             <span className="text-xl font-black text-orange-700">
-              ${transferPrice.toLocaleString()} CUP
+              $${transferPrice.toLocaleString()} CUP
             </span>
           </div>
           <div className="text-sm text-orange-600 font-semibold bg-orange-100 px-2 py-1 rounded-full text-center">
@@ -136,7 +102,7 @@ export function PriceCard({ type, selectedSeasons = [], episodeCount = 0, isAnim
         
         {type === 'tv' && selectedSeasons.length > 0 && (
           <div className="text-sm text-green-600 font-bold text-center bg-gradient-to-r from-green-100 to-emerald-100 rounded-xl p-3 border border-green-200">
-            ${(price / selectedSeasons.length).toLocaleString()} CUP por temporada (efectivo)
+            $${(price / selectedSeasons.length).toLocaleString()} CUP por temporada (efectivo)
           </div>
         )}
       </div>
