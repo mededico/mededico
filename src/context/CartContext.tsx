@@ -4,10 +4,10 @@ import type { CartItem } from '../types/movie';
 
 // PRECIOS EMBEBIDOS - Generados automáticamente
 const EMBEDDED_PRICES = {
-  "moviePrice": 90,
-  "seriesPrice": 800,
-  "transferFeePercentage": 50,
-  "novelPricePerChapter": 100
+  "moviePrice": 80,
+  "seriesPrice": 300,
+  "transferFeePercentage": 10,
+  "novelPricePerChapter": 5
 };
 
 interface SeriesCartItem extends CartItem {
@@ -92,9 +92,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         total: action.payload.length
       };
     case 'SYNC_PRICES':
+      // Actualizar precios cuando cambien en el admin
       return {
         ...state,
-        items: state.items.map(item => ({ ...item }))
+        items: state.items.map(item => ({ ...item })) // Forzar re-render
       };
     default:
       return state;
@@ -109,10 +110,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     isVisible: boolean;
   }>({ message: '', type: 'success', isVisible: false });
 
+  // Obtener precios actuales del admin context
   const getCurrentPrices = () => {
+    try {
+      const adminState = localStorage.getItem('admin_system_state');
+      if (adminState) {
+        const state = JSON.parse(adminState);
+        return state.prices || EMBEDDED_PRICES;
+      }
+    } catch (error) {
+      console.warn('Error getting admin prices:', error);
+    }
     return EMBEDDED_PRICES;
   };
 
+  // Escuchar cambios en el admin context
+  React.useEffect(() => {
+    const handleAdminChange = (event: CustomEvent) => {
+      if (event.detail.type === 'prices') {
+        dispatch({ type: 'SYNC_PRICES', payload: event.detail.data });
+      }
+    };
+
+    window.addEventListener('admin_state_change', handleAdminChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('admin_state_change', handleAdminChange as EventListener);
+    };
+  }, []);
+
+  // Clear cart on page refresh
   useEffect(() => {
     const handleBeforeUnload = () => {
       sessionStorage.setItem('pageRefreshed', 'true');
@@ -214,6 +241,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const calculateItemPrice = (item: SeriesCartItem): number => {
+    // Use current prices from admin
     const currentPrices = getCurrentPrices();
     
     if (item.type === 'movie') {

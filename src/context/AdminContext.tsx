@@ -4,34 +4,15 @@ import JSZip from 'jszip';
 // CONFIGURACIÓN EMBEBIDA - Generada automáticamente
 const EMBEDDED_CONFIG = {
   "version": "2.1.0",
-  "lastExport": "2025-09-10T08:15:54.699Z",
+  "lastExport": "2025-09-05T08:44:06.529Z",
   "prices": {
-    "moviePrice": 90,
-    "seriesPrice": 800,
-    "transferFeePercentage": 50,
-    "novelPricePerChapter": 100
+    "moviePrice": 80,
+    "seriesPrice": 300,
+    "transferFeePercentage": 10,
+    "novelPricePerChapter": 5
   },
-  "deliveryZones": [
-    {
-      "name": "barca de oro",
-      "cost": 100,
-      "id": 1757492079585,
-      "createdAt": "2025-09-10T08:14:39.585Z",
-      "updatedAt": "2025-09-10T08:14:39.585Z"
-    }
-  ],
-  "novels": [
-    {
-      "titulo": "fuerte",
-      "genero": "drama",
-      "capitulos": 100,
-      "año": 2025,
-      "descripcion": "",
-      "id": 1757492092849,
-      "createdAt": "2025-09-10T08:14:52.849Z",
-      "updatedAt": "2025-09-10T08:14:52.849Z"
-    }
-  ],
+  "deliveryZones": [],
+  "novels": [],
   "settings": {
     "autoSync": true,
     "syncInterval": 300000,
@@ -43,8 +24,7 @@ const EMBEDDED_CONFIG = {
     "totalRevenue": 0,
     "lastOrderDate": "",
     "systemUptime": "2025-09-05T07:41:37.754Z"
-  },
-  "exportedBy": "TV a la Carta Admin Panel"
+  }
 };
 
 // CREDENCIALES DE ACCESO (CONFIGURABLES)
@@ -361,9 +341,147 @@ function adminReducer(state: AdminState, action: AdminAction): AdminState {
 // Context creation
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
+// Real-time sync service
+class RealTimeSyncService {
+  private listeners: Set<(data: any) => void> = new Set();
+  private syncInterval: NodeJS.Timeout | null = null;
+  private storageKey = 'admin_system_state';
+  private configKey = 'system_config';
+
+  constructor() {
+    this.initializeSync();
+  }
+
+  private initializeSync() {
+    window.addEventListener('storage', this.handleStorageChange.bind(this));
+    this.syncInterval = setInterval(() => {
+      this.checkForUpdates();
+    }, 5000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.checkForUpdates();
+      }
+    });
+  }
+
+  private handleStorageChange(event: StorageEvent) {
+    if ((event.key === this.storageKey || event.key === this.configKey) && event.newValue) {
+      try {
+        const newState = JSON.parse(event.newValue);
+        this.notifyListeners(newState);
+      } catch (error) {
+        console.error('Error parsing sync data:', error);
+      }
+    }
+  }
+
+  private checkForUpdates() {
+    try {
+      const stored = localStorage.getItem(this.storageKey);
+      const config = localStorage.getItem(this.configKey);
+      
+      if (stored) {
+        const storedState = JSON.parse(stored);
+        this.notifyListeners(storedState);
+      }
+      
+      if (config) {
+        const configData = JSON.parse(config);
+        this.notifyListeners({ systemConfig: configData });
+      }
+    } catch (error) {
+      console.error('Error checking for updates:', error);
+    }
+  }
+
+  subscribe(callback: (data: any) => void) {
+    this.listeners.add(callback);
+    return () => this.listeners.delete(callback);
+  }
+
+  broadcast(state: AdminState) {
+    try {
+      const syncData = {
+        ...state,
+        timestamp: new Date().toISOString(),
+      };
+      localStorage.setItem(this.storageKey, JSON.stringify(syncData));
+      localStorage.setItem(this.configKey, JSON.stringify(state.systemConfig));
+      this.notifyListeners(syncData);
+    } catch (error) {
+      console.error('Error broadcasting state:', error);
+    }
+  }
+
+  private notifyListeners(data: any) {
+    this.listeners.forEach(callback => {
+      try {
+        callback(data);
+      } catch (error) {
+        console.error('Error in sync listener:', error);
+      }
+    });
+  }
+
+  destroy() {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+    }
+    window.removeEventListener('storage', this.handleStorageChange.bind(this));
+    this.listeners.clear();
+  }
+}
+
 // Provider component
 export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(adminReducer, initialState);
+  const [syncService] = React.useState(() => new RealTimeSyncService());
+
+  // Load system config on startup
+  useEffect(() => {
+    try {
+      const storedConfig = localStorage.getItem('system_config');
+      if (storedConfig) {
+        const config = JSON.parse(storedConfig);
+        dispatch({ type: 'LOAD_SYSTEM_CONFIG', payload: config });
+      }
+      
+      const stored = localStorage.getItem('admin_system_state');
+      if (stored) {
+        const storedState = JSON.parse(stored);
+        dispatch({ type: 'SYNC_STATE', payload: storedState });
+      }
+    } catch (error) {
+      console.error('Error loading initial state:', error);
+    }
+  }, []);
+
+  // Save state changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('admin_system_state', JSON.stringify(state));
+      localStorage.setItem('system_config', JSON.stringify(state.systemConfig));
+      syncService.broadcast(state);
+    } catch (error) {
+      console.error('Error saving state:', error);
+    }
+  }, [state, syncService]);
+
+  // Real-time sync listener
+  useEffect(() => {
+    const unsubscribe = syncService.subscribe((syncedState) => {
+      if (JSON.stringify(syncedState) !== JSON.stringify(state)) {
+        dispatch({ type: 'SYNC_STATE', payload: syncedState });
+      }
+    });
+    return unsubscribe;
+  }, [syncService, state]);
+
+  useEffect(() => {
+    return () => {
+      syncService.destroy();
+    };
+  }, [syncService]);
 
   // Context methods implementation
   const login = (username: string, password: string): boolean => {
@@ -503,6 +621,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         action: 'export_config_start'
       });
 
+      // Create comprehensive system configuration
       const completeConfig: SystemConfig = {
         ...state.systemConfig,
         version: '2.1.0',
@@ -519,6 +638,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         },
       };
 
+      // Generate JSON file
       const configJson = JSON.stringify(completeConfig, null, 2);
       const blob = new Blob([configJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -530,6 +650,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
+      // Update system config with export timestamp
       dispatch({ 
         type: 'UPDATE_SYSTEM_CONFIG', 
         payload: { lastExport: new Date().toISOString() } 
@@ -564,6 +685,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         action: 'export_source_start'
       });
 
+      // Importar dinámicamente el generador de código fuente
       try {
         const { generateCompleteSourceCode } = await import('../utils/sourceCodeGenerator');
         await generateCompleteSourceCode(state.systemConfig);
@@ -624,8 +746,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         action: 'sync_all_start'
       });
 
+      // Simulate comprehensive sync of all sections
       await new Promise(resolve => setTimeout(resolve, 3000));
 
+      // Update all components with current state
       const updatedConfig: SystemConfig = {
         ...state.systemConfig,
         lastExport: new Date().toISOString(),
@@ -636,6 +760,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
       dispatch({ type: 'UPDATE_SYSTEM_CONFIG', payload: updatedConfig });
       
+      // Broadcast changes to all components
       window.dispatchEvent(new CustomEvent('admin_full_sync', { 
         detail: { 
           config: updatedConfig,
@@ -694,6 +819,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         action: 'sync_start'
       });
 
+      // Simulate remote sync
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       dispatch({ 
