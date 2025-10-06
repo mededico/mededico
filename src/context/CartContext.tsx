@@ -116,16 +116,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (event.detail.type === 'prices') {
         setCurrentPrices(event.detail.data);
       }
+      
+      // Handle full state updates
+      if (event.detail.fullState?.prices) {
+        setCurrentPrices(event.detail.fullState.prices);
+      }
     };
 
     const handleAdminFullSync = (event: CustomEvent) => {
       if (event.detail.config?.prices) {
         setCurrentPrices(event.detail.config.prices);
       }
+      if (event.detail.fullState?.prices) {
+        setCurrentPrices(event.detail.fullState.prices);
+      }
+    };
+
+    // Listen for global price updates
+    const handlePricesUpdate = (event: CustomEvent) => {
+      if (event.detail.prices) {
+        setCurrentPrices(event.detail.prices);
+      }
     };
 
     window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
     window.addEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+    window.addEventListener('prices_update', handlePricesUpdate as EventListener);
+    window.addEventListener('global_admin_sync', handleAdminStateChange as EventListener);
 
     // Check for stored admin config
     try {
@@ -143,6 +160,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return () => {
       window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
       window.removeEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+      window.removeEventListener('prices_update', handlePricesUpdate as EventListener);
+      window.removeEventListener('global_admin_sync', handleAdminStateChange as EventListener);
     };
   }, []);
 

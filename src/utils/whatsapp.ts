@@ -16,7 +16,7 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
     showLocationMap = false
   } = orderData;
 
-  // Obtener el porcentaje de transferencia actual del contexto admin
+  // Obtener configuración actual del sistema en tiempo real
   const getTransferFeePercentage = () => {
     try {
       const adminState = localStorage.getItem('admin_system_state');
@@ -30,7 +30,7 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
     return 10; // Valor por defecto
   };
 
-  // Obtener precios actuales del contexto admin
+  // Obtener precios actuales del contexto admin con sincronización en tiempo real
   const getCurrentPrices = () => {
     try {
       const adminState = localStorage.getItem('admin_system_state');
@@ -41,6 +41,18 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
           seriesPrice: state.prices?.seriesPrice || 300,
           novelPricePerChapter: state.prices?.novelPricePerChapter || 5,
           transferFeePercentage: state.prices?.transferFeePercentage || 10
+        };
+      }
+      
+      // Fallback to system_config if admin_system_state is not available
+      const systemConfig = localStorage.getItem('system_config');
+      if (systemConfig) {
+        const config = JSON.parse(systemConfig);
+        return {
+          moviePrice: config.prices?.moviePrice || 80,
+          seriesPrice: config.prices?.seriesPrice || 300,
+          novelPricePerChapter: config.prices?.novelPricePerChapter || 5,
+          transferFeePercentage: config.prices?.transferFeePercentage || 10
         };
       }
     } catch (error) {

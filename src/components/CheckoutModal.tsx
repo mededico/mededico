@@ -83,12 +83,17 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
 
     loadDeliveryZones();
 
-    // Listen for admin updates
+    // Listen for admin updates with enhanced real-time sync
     const handleAdminStateChange = (event: CustomEvent) => {
       if (event.detail.type === 'delivery_zone_add' || 
           event.detail.type === 'delivery_zone_update' || 
           event.detail.type === 'delivery_zone_delete') {
         loadDeliveryZones();
+      }
+      
+      // Handle full state updates
+      if (event.detail.fullState?.deliveryZones) {
+        setDeliveryZones(event.detail.fullState.deliveryZones);
       }
     };
 
@@ -96,14 +101,28 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, items, total }: Che
       if (event.detail.config?.deliveryZones) {
         setDeliveryZones(event.detail.config.deliveryZones);
       }
+      if (event.detail.fullState?.deliveryZones) {
+        setDeliveryZones(event.detail.fullState.deliveryZones);
+      }
+    };
+
+    // Listen for global delivery zone updates
+    const handleDeliveryZonesUpdate = (event: CustomEvent) => {
+      if (event.detail.allZones) {
+        setDeliveryZones(event.detail.allZones);
+      }
     };
 
     window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
     window.addEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+    window.addEventListener('delivery_zones_update', handleDeliveryZonesUpdate as EventListener);
+    window.addEventListener('global_admin_sync', handleAdminStateChange as EventListener);
 
     return () => {
       window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
       window.removeEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+      window.removeEventListener('delivery_zones_update', handleDeliveryZonesUpdate as EventListener);
+      window.removeEventListener('global_admin_sync', handleAdminStateChange as EventListener);
     };
   }, []);
 

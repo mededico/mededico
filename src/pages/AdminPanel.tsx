@@ -231,18 +231,52 @@ export function AdminPanel() {
     try {
       addNotification('Generando backup completo del sistema...', 'info');
 
-      const fullSystemConfig = {
+      // Get the complete current state for backup
+      const fullSystemState = {
         version: state.systemConfig.version,
+        exportDate: new Date().toISOString(),
+        exportType: 'full_system_backup',
         prices: state.prices,
         deliveryZones: state.deliveryZones,
         novels: state.novels,
-        settings: state.systemConfig,
+        systemConfig: state.systemConfig,
+        notifications: state.notifications,
         syncStatus: state.syncStatus,
-        exportDate: new Date().toISOString(),
+        metadata: {
+          totalNovels: state.novels.length,
+          totalDeliveryZones: state.deliveryZones.length,
+          unreadNotifications: state.notifications.filter(n => !n.read).length,
+          novelsByStatus: {
+            transmision: state.novels.filter(n => n.estado === 'transmision').length,
+            finalizada: state.novels.filter(n => n.estado === 'finalizada').length
+          },
+          novelsByCountry: state.novels.reduce((acc: any, novel: any) => {
+            const country = novel.pais || 'No especificado';
+            acc[country] = (acc[country] || 0) + 1;
+            return acc;
+          }, {}),
+          novelsByGenre: state.novels.reduce((acc: any, novel: any) => {
+            acc[novel.genero] = (acc[novel.genero] || 0) + 1;
+            return acc;
+          }, {})
+        }
       };
 
-      await generateCompleteSourceCode(fullSystemConfig);
+      // Generate complete source code with current state embedded
+      await generateCompleteSourceCode(fullSystemState);
       addNotification('Backup completo generado exitosamente', 'success');
+      
+      // Update system metadata
+      updateSystemConfig({
+        ...state.systemConfig,
+        lastBackup: new Date().toISOString(),
+        metadata: {
+          ...state.systemConfig.metadata,
+          lastBackupDate: new Date().toISOString(),
+          backupCount: (state.systemConfig.metadata?.backupCount || 0) + 1
+        }
+      });
+      
     } catch (error) {
       console.error('Error al generar backup completo:', error);
       addNotification('Error al generar el backup completo', 'error');

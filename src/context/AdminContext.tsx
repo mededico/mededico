@@ -287,15 +287,27 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       };
       localStorage.setItem('system_config', JSON.stringify(systemConfig));
 
-      // Emit events for real-time synchronization
+      // Emit detailed events for real-time synchronization across the entire app
       const event = new CustomEvent('admin_state_change', {
         detail: { 
           state: state,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          fullState: state,
+          config: systemConfig
         }
       });
       window.dispatchEvent(event);
 
+      // Also emit a global sync event for all components
+      const globalSyncEvent = new CustomEvent('global_admin_sync', {
+        detail: {
+          type: 'full_state_update',
+          state: state,
+          config: systemConfig,
+          timestamp: new Date().toISOString()
+        }
+      });
+      window.dispatchEvent(globalSyncEvent);
     } catch (error) {
       console.error('Error saving admin state:', error);
     }
@@ -345,15 +357,28 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'ADD_NOVEL', payload: novel });
     addNotification(`Novela "${novel.titulo}" agregada correctamente`, 'success');
     
-    // Emit specific event for novel addition
+    // Emit specific event for novel addition with full state
     const event = new CustomEvent('admin_state_change', {
       detail: { 
         type: 'novel_add',
         data: novel,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fullState: state,
+        novels: [...state.novels, novel]
       }
     });
     window.dispatchEvent(event);
+
+    // Emit global event for immediate UI updates
+    const globalEvent = new CustomEvent('novel_catalog_update', {
+      detail: {
+        action: 'add',
+        novel: novel,
+        allNovels: [...state.novels, novel],
+        timestamp: new Date().toISOString()
+      }
+    });
+    window.dispatchEvent(globalEvent);
   };
 
   const updateNovel = (novel: Novel) => {
@@ -364,15 +389,28 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'UPDATE_NOVEL', payload: updatedNovel });
     addNotification(`Novela "${novel.titulo}" actualizada correctamente`, 'success');
     
-    // Emit specific event for novel update
+    // Emit specific event for novel update with full state
     const event = new CustomEvent('admin_state_change', {
       detail: { 
         type: 'novel_update',
         data: updatedNovel,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fullState: state,
+        novels: state.novels.map(n => n.id === novel.id ? updatedNovel : n)
       }
     });
     window.dispatchEvent(event);
+
+    // Emit global event for immediate UI updates
+    const globalEvent = new CustomEvent('novel_catalog_update', {
+      detail: {
+        action: 'update',
+        novel: updatedNovel,
+        allNovels: state.novels.map(n => n.id === novel.id ? updatedNovel : n),
+        timestamp: new Date().toISOString()
+      }
+    });
+    window.dispatchEvent(globalEvent);
   };
 
   const deleteNovel = (id: number) => {
@@ -382,15 +420,28 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       addNotification(`Novela "${novel.titulo}" eliminada`, 'info');
     }
     
-    // Emit specific event for novel deletion
+    // Emit specific event for novel deletion with updated state
     const event = new CustomEvent('admin_state_change', {
       detail: { 
         type: 'novel_delete',
         data: { id },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fullState: state,
+        novels: state.novels.filter(n => n.id !== id)
       }
     });
     window.dispatchEvent(event);
+
+    // Emit global event for immediate UI updates
+    const globalEvent = new CustomEvent('novel_catalog_update', {
+      detail: {
+        action: 'delete',
+        novelId: id,
+        allNovels: state.novels.filter(n => n.id !== id),
+        timestamp: new Date().toISOString()
+      }
+    });
+    window.dispatchEvent(globalEvent);
   };
 
   const addDeliveryZone = (zoneData: Omit<DeliveryZone, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -403,15 +454,28 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'ADD_DELIVERY_ZONE', payload: zone });
     addNotification(`Zona de entrega "${zone.name}" agregada`, 'success');
     
-    // Emit specific event for delivery zone addition
+    // Emit specific event for delivery zone addition with full state
     const event = new CustomEvent('admin_state_change', {
       detail: { 
         type: 'delivery_zone_add',
         data: zone,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fullState: state,
+        deliveryZones: [...state.deliveryZones, zone]
       }
     });
     window.dispatchEvent(event);
+
+    // Emit global event for checkout modal updates
+    const globalEvent = new CustomEvent('delivery_zones_update', {
+      detail: {
+        action: 'add',
+        zone: zone,
+        allZones: [...state.deliveryZones, zone],
+        timestamp: new Date().toISOString()
+      }
+    });
+    window.dispatchEvent(globalEvent);
   };
 
   const updateDeliveryZone = (zone: DeliveryZone) => {
@@ -422,15 +486,28 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'UPDATE_DELIVERY_ZONE', payload: updatedZone });
     addNotification(`Zona de entrega "${zone.name}" actualizada`, 'success');
     
-    // Emit specific event for delivery zone update
+    // Emit specific event for delivery zone update with full state
     const event = new CustomEvent('admin_state_change', {
       detail: { 
         type: 'delivery_zone_update',
         data: updatedZone,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fullState: state,
+        deliveryZones: state.deliveryZones.map(z => z.id === zone.id ? updatedZone : z)
       }
     });
     window.dispatchEvent(event);
+
+    // Emit global event for checkout modal updates
+    const globalEvent = new CustomEvent('delivery_zones_update', {
+      detail: {
+        action: 'update',
+        zone: updatedZone,
+        allZones: state.deliveryZones.map(z => z.id === zone.id ? updatedZone : z),
+        timestamp: new Date().toISOString()
+      }
+    });
+    window.dispatchEvent(globalEvent);
   };
 
   const deleteDeliveryZone = (id: number) => {
@@ -440,30 +517,55 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       addNotification(`Zona de entrega "${zone.name}" eliminada`, 'info');
     }
     
-    // Emit specific event for delivery zone deletion
+    // Emit specific event for delivery zone deletion with updated state
     const event = new CustomEvent('admin_state_change', {
       detail: { 
         type: 'delivery_zone_delete',
         data: { id },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fullState: state,
+        deliveryZones: state.deliveryZones.filter(z => z.id !== id)
       }
     });
     window.dispatchEvent(event);
+
+    // Emit global event for checkout modal updates
+    const globalEvent = new CustomEvent('delivery_zones_update', {
+      detail: {
+        action: 'delete',
+        zoneId: id,
+        allZones: state.deliveryZones.filter(z => z.id !== id),
+        timestamp: new Date().toISOString()
+      }
+    });
+    window.dispatchEvent(globalEvent);
   };
 
   const updatePrices = (prices: Prices) => {
     dispatch({ type: 'UPDATE_PRICES', payload: prices });
     addNotification('Precios actualizados correctamente', 'success');
     
-    // Emit specific event for price update
+    // Emit specific event for price update with full state
     const event = new CustomEvent('admin_state_change', {
       detail: { 
         type: 'prices',
         data: prices,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        fullState: state,
+        prices: prices
       }
     });
     window.dispatchEvent(event);
+
+    // Emit global event for cart and price updates
+    const globalEvent = new CustomEvent('prices_update', {
+      detail: {
+        action: 'update',
+        prices: prices,
+        timestamp: new Date().toISOString()
+      }
+    });
+    window.dispatchEvent(globalEvent);
   };
 
   const addNotification = (message: string, type: Notification['type']) => {
@@ -529,14 +631,43 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       
       addNotification('Configuración importada correctamente', 'success');
       
-      // Emit full sync event
+      // Emit comprehensive full sync event
       const event = new CustomEvent('admin_full_sync', {
         detail: { 
           config: config,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          fullState: state,
+          syncType: 'import'
         }
       });
       window.dispatchEvent(event);
+      
+      // Emit global events for all components
+      const globalEvents = [
+        new CustomEvent('novel_catalog_update', {
+          detail: {
+            action: 'full_sync',
+            allNovels: config.novels || [],
+            timestamp: new Date().toISOString()
+          }
+        }),
+        new CustomEvent('delivery_zones_update', {
+          detail: {
+            action: 'full_sync',
+            allZones: config.deliveryZones || [],
+            timestamp: new Date().toISOString()
+          }
+        }),
+        new CustomEvent('prices_update', {
+          detail: {
+            action: 'full_sync',
+            prices: config.prices || state.prices,
+            timestamp: new Date().toISOString()
+          }
+        })
+      ];
+
+      globalEvents.forEach(event => window.dispatchEvent(event));
       
       return true;
     } catch (error) {

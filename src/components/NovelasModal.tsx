@@ -60,12 +60,17 @@ export function NovelasModal({ isOpen, onClose, onFinalizePedido }: NovelasModal
 
     loadNovels();
 
-    // Listen for admin updates
+    // Listen for admin updates with enhanced real-time sync
     const handleAdminStateChange = (event: CustomEvent) => {
       if (event.detail.type === 'novel_add' || 
           event.detail.type === 'novel_update' || 
           event.detail.type === 'novel_delete') {
         loadNovels();
+      }
+      
+      // Handle full state updates
+      if (event.detail.fullState?.novels) {
+        setAdminNovels(event.detail.fullState.novels);
       }
     };
 
@@ -73,14 +78,28 @@ export function NovelasModal({ isOpen, onClose, onFinalizePedido }: NovelasModal
       if (event.detail.config?.novels) {
         setAdminNovels(event.detail.config.novels);
       }
+      if (event.detail.fullState?.novels) {
+        setAdminNovels(event.detail.fullState.novels);
+      }
+    };
+
+    // Listen for global novel catalog updates
+    const handleNovelCatalogUpdate = (event: CustomEvent) => {
+      if (event.detail.allNovels) {
+        setAdminNovels(event.detail.allNovels);
+      }
     };
 
     window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
     window.addEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+    window.addEventListener('novel_catalog_update', handleNovelCatalogUpdate as EventListener);
+    window.addEventListener('global_admin_sync', handleAdminStateChange as EventListener);
 
     return () => {
       window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
       window.removeEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+      window.removeEventListener('novel_catalog_update', handleNovelCatalogUpdate as EventListener);
+      window.removeEventListener('global_admin_sync', handleAdminStateChange as EventListener);
     };
   }, []);
 

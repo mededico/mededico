@@ -28,8 +28,8 @@ export function Home() {
   const [trendingTimeWindow, setTrendingTimeWindow] = useState<TrendingTimeWindow>('day');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [showNovelasModal, setShowNovelasModal] = useState(false);
+  const [contentLastUpdate, setContentLastUpdate] = useState<Date>(new Date());
 
   const currentPrices = getCurrentPrices();
   const timeWindowLabels = {
@@ -47,7 +47,7 @@ export function Home() {
       const novelTrending = getNovelTrendingContent(timeWindow);
       setNovelTrendingContent(novelTrending);
       
-      setLastUpdate(new Date());
+      setContentLastUpdate(new Date());
     } catch (err) {
       console.error('Error fetching trending content:', err);
     }
@@ -132,7 +132,7 @@ export function Home() {
       setPopularMovies(filteredMovies);
       setPopularTVShows(filteredTVShows);
       setPopularAnime(filteredAnime);
-      setLastUpdate(new Date());
+      setContentLastUpdate(new Date());
     } catch (err) {
       setError('Error al cargar el contenido. Por favor, intenta de nuevo.');
       console.error('Error fetching home data:', err);
@@ -144,6 +144,47 @@ export function Home() {
   useEffect(() => {
     fetchAllContent();
   }, []);
+
+  // Real-time sync with admin changes
+  useEffect(() => {
+    const handleAdminStateChange = (event: CustomEvent) => {
+      // Refresh content when admin makes changes
+      if (event.detail.type === 'novel_add' || 
+          event.detail.type === 'novel_update' || 
+          event.detail.type === 'novel_delete' ||
+          event.detail.type === 'prices' ||
+          event.detail.type === 'delivery_zone_add' ||
+          event.detail.type === 'delivery_zone_update' ||
+          event.detail.type === 'delivery_zone_delete') {
+        
+        // Update novels trending content
+        const novelTrending = getNovelTrendingContent(trendingTimeWindow);
+        setNovelTrendingContent(novelTrending);
+        setContentLastUpdate(new Date());
+        
+        // Show notification to user about the update
+        console.log('Contenido actualizado en tiempo real desde el panel de administración');
+      }
+    };
+
+    const handleAdminFullSync = (event: CustomEvent) => {
+      // Full refresh when admin imports configuration
+      if (event.detail.config) {
+        const novelTrending = getNovelTrendingContent(trendingTimeWindow);
+        setNovelTrendingContent(novelTrending);
+        setContentLastUpdate(new Date());
+        console.log('Sincronización completa realizada desde el panel de administración');
+      }
+    };
+
+    window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
+    window.addEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+
+    return () => {
+      window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
+      window.removeEventListener('admin_full_sync', handleAdminFullSync as EventListener);
+    };
+  }, [trendingTimeWindow]);
 
   useEffect(() => {
     fetchTrendingContent(trendingTimeWindow);
@@ -509,7 +550,7 @@ export function Home() {
 
         {/* Last Update Info (Hidden from users) */}
         <div className="hidden">
-          <p>Última actualización: {lastUpdate.toLocaleString()}</p>
+          <p>Última actualización: {contentLastUpdate.toLocaleString()}</p>
         </div>
       </div>
       
