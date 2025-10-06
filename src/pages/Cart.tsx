@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, Star, Calendar, MessageCircle, ArrowLeft, CreditCard as Edit3, Monitor, DollarSign, CreditCard, Calculator, Sparkles, Zap, Heart, Check, X, Clapperboard, Send, BookOpen } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -15,6 +15,46 @@ export function Cart() {
   const adminContext = React.useContext(AdminContext);
   const [showCheckoutModal, setShowCheckoutModal] = React.useState(false);
   const [showNovelasModal, setShowNovelasModal] = React.useState(false);
+  const [realTimeDeliveryZones, setRealTimeDeliveryZones] = React.useState<any[]>([]);
+  const [realTimePrices, setRealTimePrices] = React.useState<any>(null);
+
+  // Real-time sync with admin changes
+  useEffect(() => {
+    const handleDeliveryZonesUpdate = (event: CustomEvent) => {
+      if (event.detail.allZones) {
+        setRealTimeDeliveryZones(event.detail.allZones);
+      }
+    };
+
+    const handlePricesUpdate = (event: CustomEvent) => {
+      if (event.detail.prices) {
+        setRealTimePrices(event.detail.prices);
+      }
+    };
+
+    const handleAdminStateChange = (event: CustomEvent) => {
+      if (event.detail.fullState) {
+        if (event.detail.fullState.deliveryZones) {
+          setRealTimeDeliveryZones(event.detail.fullState.deliveryZones);
+        }
+        if (event.detail.fullState.prices) {
+          setRealTimePrices(event.detail.fullState.prices);
+        }
+      }
+    };
+
+    window.addEventListener('delivery_zones_update', handleDeliveryZonesUpdate as EventListener);
+    window.addEventListener('prices_update', handlePricesUpdate as EventListener);
+    window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
+    window.addEventListener('global_admin_sync', handleAdminStateChange as EventListener);
+
+    return () => {
+      window.removeEventListener('delivery_zones_update', handleDeliveryZonesUpdate as EventListener);
+      window.removeEventListener('prices_update', handlePricesUpdate as EventListener);
+      window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
+      window.removeEventListener('global_admin_sync', handleAdminStateChange as EventListener);
+    };
+  }, []);
 
   const handleCheckout = (orderData: OrderData) => {
     // Calculate totals
