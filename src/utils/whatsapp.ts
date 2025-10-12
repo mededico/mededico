@@ -16,7 +16,7 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
     showLocationMap = false
   } = orderData;
 
-  // Obtener configuración actual del sistema en tiempo real
+  // Obtener el porcentaje de transferencia actual del contexto admin
   const getTransferFeePercentage = () => {
     try {
       const adminState = localStorage.getItem('admin_system_state');
@@ -30,7 +30,7 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
     return 10; // Valor por defecto
   };
 
-  // Obtener precios actuales del contexto admin con sincronización en tiempo real
+  // Obtener precios actuales del contexto admin
   const getCurrentPrices = () => {
     try {
       const adminState = localStorage.getItem('admin_system_state');
@@ -41,18 +41,6 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
           seriesPrice: state.prices?.seriesPrice || 300,
           novelPricePerChapter: state.prices?.novelPricePerChapter || 5,
           transferFeePercentage: state.prices?.transferFeePercentage || 10
-        };
-      }
-      
-      // Fallback to system_config if admin_system_state is not available
-      const systemConfig = localStorage.getItem('system_config');
-      if (systemConfig) {
-        const config = JSON.parse(systemConfig);
-        return {
-          moviePrice: config.prices?.moviePrice || 80,
-          seriesPrice: config.prices?.seriesPrice || 300,
-          novelPricePerChapter: config.prices?.novelPricePerChapter || 5,
-          transferFeePercentage: config.prices?.transferFeePercentage || 10
         };
       }
     } catch (error) {
@@ -249,8 +237,34 @@ export function sendOrderToWhatsApp(orderData: OrderData): void {
   message += `🌟 *¡Gracias por elegir TV a la Carta!*`;
   
   const encodedMessage = encodeURIComponent(message);
-  const phoneNumber = '5354690878'; // Número de WhatsApp
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-  
-  window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  const phoneNumber = '5354690878';
+
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isMacOS = /Macintosh|MacIntel|MacPPC|Mac68K/i.test(navigator.userAgent);
+  const isWindows = /Win32|Win64|Windows|WinCE/i.test(navigator.userAgent);
+
+  let whatsappUrl: string;
+
+  if (isMobile) {
+    if (isIOS) {
+      whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+    } else if (isAndroid) {
+      whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+    } else {
+      whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    }
+  } else {
+    whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+  }
+
+  if (isMobile) {
+    window.location.href = whatsappUrl;
+  } else {
+    const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    if (!newWindow) {
+      window.location.href = whatsappUrl;
+    }
+  }
 }

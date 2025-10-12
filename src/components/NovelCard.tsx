@@ -25,38 +25,8 @@ export function NovelCard({ novel }: NovelCardProps) {
   const [toastMessage, setToastMessage] = React.useState('');
   const [isHovered, setIsHovered] = React.useState(false);
   const [isAddingToCart, setIsAddingToCart] = React.useState(false);
-  const [currentPrices, setCurrentPrices] = React.useState(getCurrentPrices());
   
-  // Real-time price updates
-  React.useEffect(() => {
-    const handlePricesUpdate = (event: CustomEvent) => {
-      if (event.detail.prices) {
-        setCurrentPrices(event.detail.prices);
-      }
-    };
-
-    const handleAdminStateChange = (event: CustomEvent) => {
-      if (event.detail.fullState?.prices) {
-        setCurrentPrices(event.detail.fullState.prices);
-      }
-    };
-
-    window.addEventListener('prices_update', handlePricesUpdate as EventListener);
-    window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
-    window.addEventListener('global_admin_sync', handleAdminStateChange as EventListener);
-
-    return () => {
-      window.removeEventListener('prices_update', handlePricesUpdate as EventListener);
-      window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
-      window.removeEventListener('global_admin_sync', handleAdminStateChange as EventListener);
-    };
-  }, []);
-
-  // Update prices when cart context changes
-  React.useEffect(() => {
-    setCurrentPrices(getCurrentPrices());
-  }, [getCurrentPrices]);
-  
+  const currentPrices = getCurrentPrices();
   const inCart = isInCart(novel.id);
 
   const getNovelImage = (novel: any) => {

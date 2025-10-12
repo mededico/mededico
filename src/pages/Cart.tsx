@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, Star, Calendar, MessageCircle, ArrowLeft, CreditCard as Edit3, Monitor, DollarSign, CreditCard, Calculator, Sparkles, Zap, Heart, Check, X, Clapperboard, Send, BookOpen } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -15,46 +15,6 @@ export function Cart() {
   const adminContext = React.useContext(AdminContext);
   const [showCheckoutModal, setShowCheckoutModal] = React.useState(false);
   const [showNovelasModal, setShowNovelasModal] = React.useState(false);
-  const [realTimeDeliveryZones, setRealTimeDeliveryZones] = React.useState<any[]>([]);
-  const [realTimePrices, setRealTimePrices] = React.useState<any>(null);
-
-  // Real-time sync with admin changes
-  useEffect(() => {
-    const handleDeliveryZonesUpdate = (event: CustomEvent) => {
-      if (event.detail.allZones) {
-        setRealTimeDeliveryZones(event.detail.allZones);
-      }
-    };
-
-    const handlePricesUpdate = (event: CustomEvent) => {
-      if (event.detail.prices) {
-        setRealTimePrices(event.detail.prices);
-      }
-    };
-
-    const handleAdminStateChange = (event: CustomEvent) => {
-      if (event.detail.fullState) {
-        if (event.detail.fullState.deliveryZones) {
-          setRealTimeDeliveryZones(event.detail.fullState.deliveryZones);
-        }
-        if (event.detail.fullState.prices) {
-          setRealTimePrices(event.detail.fullState.prices);
-        }
-      }
-    };
-
-    window.addEventListener('delivery_zones_update', handleDeliveryZonesUpdate as EventListener);
-    window.addEventListener('prices_update', handlePricesUpdate as EventListener);
-    window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
-    window.addEventListener('global_admin_sync', handleAdminStateChange as EventListener);
-
-    return () => {
-      window.removeEventListener('delivery_zones_update', handleDeliveryZonesUpdate as EventListener);
-      window.removeEventListener('prices_update', handlePricesUpdate as EventListener);
-      window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
-      window.removeEventListener('global_admin_sync', handleAdminStateChange as EventListener);
-    };
-  }, []);
 
   const handleCheckout = (orderData: OrderData) => {
     // Calculate totals
@@ -644,7 +604,7 @@ export function Cart() {
             {/* WhatsApp Button */}
             <button
               onClick={() => setShowCheckoutModal(true)}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center transform hover:scale-105 hover:shadow-lg touch-manipulation"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 active:from-green-700 active:to-emerald-700 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center transform hover:scale-105 active:scale-95 hover:shadow-lg touch-manipulation"
             >
               <Send className="mr-3 h-6 w-6" />
               Finalizar Pedido

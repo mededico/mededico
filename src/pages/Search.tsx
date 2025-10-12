@@ -23,59 +23,8 @@ export function SearchPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
-  const [adminNovels, setAdminNovels] = useState<any[]>([]);
 
   const query = searchParams.get('q') || '';
-
-  // Real-time sync with admin novel changes
-  useEffect(() => {
-    const handleNovelCatalogUpdate = (event: CustomEvent) => {
-      if (event.detail.allNovels) {
-        setAdminNovels(event.detail.allNovels);
-        
-        // Re-run search with updated novels if there's a query
-        if (query) {
-          const novelMatches = event.detail.allNovels.filter((novel: any) =>
-            novel.titulo.toLowerCase().includes(query.toLowerCase()) ||
-            novel.genero.toLowerCase().includes(query.toLowerCase()) ||
-            (novel.pais && novel.pais.toLowerCase().includes(query.toLowerCase()))
-          );
-          setNovelResults(novelMatches);
-        }
-      }
-    };
-
-    const handleAdminStateChange = (event: CustomEvent) => {
-      if (event.detail.fullState?.novels) {
-        setAdminNovels(event.detail.fullState.novels);
-        
-        // Re-run search if there's a query
-        if (query) {
-          const novelMatches = event.detail.fullState.novels.filter((novel: any) =>
-            novel.titulo.toLowerCase().includes(query.toLowerCase()) ||
-            novel.genero.toLowerCase().includes(query.toLowerCase()) ||
-            (novel.pais && novel.pais.toLowerCase().includes(query.toLowerCase()))
-          );
-          setNovelResults(novelMatches);
-        }
-      }
-    };
-
-    window.addEventListener('novel_catalog_update', handleNovelCatalogUpdate as EventListener);
-    window.addEventListener('admin_state_change', handleAdminStateChange as EventListener);
-    window.addEventListener('global_admin_sync', handleAdminStateChange as EventListener);
-
-    return () => {
-      window.removeEventListener('novel_catalog_update', handleNovelCatalogUpdate as EventListener);
-      window.removeEventListener('admin_state_change', handleAdminStateChange as EventListener);
-      window.removeEventListener('global_admin_sync', handleAdminStateChange as EventListener);
-    };
-  }, [query]);
-
-  // Initialize admin novels
-  useEffect(() => {
-    setAdminNovels(adminState.novels || []);
-  }, [adminState.novels]);
 
   const searchTypeLabels = {
     all: 'Todo',
@@ -90,11 +39,11 @@ export function SearchPage() {
       if (!append) setLoading(true);
       
       // Search novels first
-      const novelMatches = adminNovels.filter(novel =>
+      const novelMatches = adminState.novels?.filter(novel =>
         novel.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
         novel.genero.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (novel.pais && novel.pais.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
+      ) || [];
       
       setNovelResults(novelMatches);
       
