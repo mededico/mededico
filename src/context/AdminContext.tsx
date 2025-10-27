@@ -249,13 +249,13 @@ const EMBEDDED_CONFIG = {
       "updatedAt": "2025-10-12T01:09:31.363Z"
     },
     {
-      "titulo": "Amar, donde el amor teje sus redes",
+      "titulo": "A.mar, donde el amor teje sus redes",
       "genero": "Romance",
       "capitulos": 90,
       "año": 2025,
-      "descripcion": "Estrella Contreras, una madre soltera que lucha por criar a su hija Azul, regresa a su pueblo natal tras la muerte de su padre, donde conoce a Fabián Bravo, un padre viudo y pescador que lucha por recuperar la custodia de su hija Yazmín.",
+      "descripcion": "Estrella, madre soltera, regresa al pequeño pueblo pesquero de su juventud tras la muerte de su padre. Se enamora de Fabián, padre viudo y pescador, y se enfrenta a un huracán de problemas que ponen en riesgo el bienestar de sus familias.",
       "pais": "México",
-      "imagen": "https://f005.backblazeb2.com/file/120000/tvalacarta/amar+donde+el+amor+teje+sus+redes.jpg",
+      "imagen": "https://f005.backblazeb2.com/file/tvalacartaplus/tvalacartaplus/A.mar%2C+donde+el+amor+teje+sus+redes.jpg",
       "estado": "finalizada",
       "id": 1759548453473,
       "createdAt": "2025-10-04T03:27:33.473Z",
@@ -281,11 +281,11 @@ const EMBEDDED_CONFIG = {
       "año": 2023,
       "descripcion": "Amor perfecto novela brasileña, Mare es una joven visionaria, regresa a su pueblo natal en 1934 para tomar las riendas del hotel familiar. Sus sueños se ven truncados cuando su padre, cegado por los prejuicios, la obliga a casarse con Gaspar, un hombre malvado y sin escrúpulos. La ambición desmedida de Gilda, la madrastra de Mare, la lleva a conspirar con Gaspar para deshacerse de Leonel, el padre de Mare, y culpar a la joven de su muerte.\n\nMare es encarcelada injustamente y da a luz en la cárcel. Tras ocho años en prisión, finalmente cumple su condena en el año 1942, sale de prisión con un solo objetivo, vengarse de quienes la traicionaron y recuperar a su hijo perdido.\n\nEn su camino, Mare se reencuentra con Orlando, un médico que la amó en el pasado y que ahora está dispuesto a luchar por ella. Juntos, se enfrentan a los poderosos de Sao Jacinto. Mientras tanto Marcelino, es hijo de Orlando y Mare, se ha criado en un monasterio, a cargo de Fray León, quien se ha convertido en una figura paterna para el joven.\n\nGilda se ha convertido en una mujer poderosa e influyente, Mare hará todo en sus manos para recuperar su vida, reencontrarse con su hijo y vengarse de aquellos que le hicieron daño. Amor perfecto telenovela brasileña. ",
       "pais": "Brasil",
-      "imagen": "https://f005.backblazeb2.com/file/120000/tvalacarta/e7dWk4egyN4MvtB1y1HROZIHI.jpeg",
+      "imagen": "https://f005.backblazeb2.com/file/tvalacartaplus/tvalacartaplus/Amor+Perfecto.jpg",
       "estado": "finalizada",
       "id": 1759548723639,
       "createdAt": "2025-10-04T03:32:03.639Z",
-      "updatedAt": "2025-10-04T03:32:03.639Z"
+      "updatedAt": "2025-10-16T07:53:21.464Z"
     },
     {
       "titulo": "Holding",
@@ -294,11 +294,11 @@ const EMBEDDED_CONFIG = {
       "año": 2024,
       "descripcion": "La campeona mundial de apnea, Aydan Türker, se prepara para una nueva inmersión récord. Aydan no solo es una atleta exitosa; es una mujer emprendedora que ha entregado su corazón a los niños. Todos los ingresos que obtiene de su gran pasión, el buceo, los dedica a mantener en pie las escuelas que fundó, incluyendo aquellas que atienden a niños con necesidades educativas especiales. Uno de esos colegios le traerá a su vida a F?rat y al comisario Kerem. Uno de los principales patrocinadores de Aydan Türker es Alt?nordu Holding, uno de los grupos empresariales más grandes del país. Bajo el liderazgo de Osman Alt?nordu y con el impulso de sus hijas Ebru, Ceyda y Sema, la empresa crece día a día con una imagen impecable. Sin embargo, detrás de ese brillante rostro se esconden luchas de poder, conflictos familiares y un pasado oscuro. Como todo gran poder, Alt?nordu Holding también tiene grandes enemigos. Su adversario más peligroso es Mahir Beyo?lu, cómplice de aquel pasado oscuro. El viejo amigo y compañero de Osman, Zakir, tendrá que jugar con astucia para detener a Mahir. En medio de este caos, Osman descubre que padece una enfermedad incurable. Al borde de una ruptura total, se encuentra frente a la necesidad de enfrentarse al secreto mejor guardado de su vida: su hija, y con ello, a toda su familia. Para esa confrontación, Osman elige el mismo día en que Aydan romperá su nuevo récord. Ese día marcará el inicio de un viaje sin retorno para todos.",
       "pais": "Turquía",
-      "imagen": "https://f005.backblazeb2.com/file/120000/tvalacarta/holding.jpeg",
+      "imagen": "https://f005.backblazeb2.com/file/tvalacartaplus/tvalacartaplus/Holding.jpg",
       "estado": "finalizada",
       "id": 1759548810927,
       "createdAt": "2025-10-04T03:33:30.927Z",
-      "updatedAt": "2025-10-04T03:41:48.825Z"
+      "updatedAt": "2025-10-16T07:49:47.713Z"
     },
     {
       "titulo": "La realeza",
@@ -320,11 +320,11 @@ const EMBEDDED_CONFIG = {
       "año": 2024,
       "descripcion": "En Valentina, mi amor especial, Herrera encarna a una joven en el espectro autista, quien es un genio en el mundo de la tecnología. El papel masculino principal es interpretado por Mauricio Novoa, un actor mexicano en ascenso, conocido por sus actuaciones en las últimas telenovelas producidas en Miami.\n\nValentina ha crecido protegida de la sociedad por su madre adoptiva en el pequeño pueblo de Chiquilistlán, donde destacó académicamente. Mudarse a la gran ciudad de Guadalajara después de que su madre fallece en un accidente será muy difícil, ya que se enfrentará lo peor y lo mejor de la humanidad: se enamorará por primera vez, conocerá nuevos amigos, pero también la envidia y los celos de aquellos que eligen no aceptarla.",
       "pais": "México",
-      "imagen": "https://f005.backblazeb2.com/file/120000/tvalacarta/valentina+mi+amor+especial.jpeg",
+      "imagen": "https://f005.backblazeb2.com/file/tvalacartaplus/tvalacartaplus/Valentina%2C+mi+amor+especial.jpg",
       "estado": "finalizada",
       "id": 1759549070923,
       "createdAt": "2025-10-04T03:37:50.923Z",
-      "updatedAt": "2025-10-04T03:37:50.923Z"
+      "updatedAt": "2025-10-16T12:40:22.316Z"
     },
     {
       "titulo": "Bahar",
@@ -480,7 +480,7 @@ const EMBEDDED_CONFIG = {
       "estado": "finalizada",
       "id": 1760022873950,
       "createdAt": "2025-10-09T15:14:33.950Z",
-      "updatedAt": "2025-10-12T01:11:03.187Z"
+      "updatedAt": "2025-10-16T07:50:24.024Z"
     },
     {
       "titulo": "Monteverde",
@@ -587,19 +587,6 @@ const EMBEDDED_CONFIG = {
       "updatedAt": "2025-10-12T01:04:39.012Z"
     },
     {
-      "titulo": "Manía de ti",
-      "genero": "Drama",
-      "capitulos": 111,
-      "año": 2024,
-      "descripcion": "Narra la historia de Luna (Moreira) y Viola (Gabz), dos chicas que se convierten en amigas cuando la segunda se instala en Angra dos Reis junto a su marido Mavi. Con el tiempo, Viola se destaca en la gastronomía, misma área de Luna y también se involucra con Rudá (Chay Suede), el hombre al que Luna ama. Años después, Viola se ha convertido en una éxitosa chef, mientras Luna perdió todo lo que tenía. Ambas rivales se unen para intentar liberar a Rudá de la cárcel, tras una trampa ocasionada por Mavi.",
-      "pais": "Brasil",
-      "imagen": "https://f005.backblazeb2.com/file/120000/tvalacarta/mania+de+ti2.jpg",
-      "estado": "finalizada",
-      "id": 1760120912035,
-      "createdAt": "2025-10-10T18:28:32.035Z",
-      "updatedAt": "2025-10-10T18:28:32.035Z"
-    },
-    {
       "titulo": "Mehmed Sultán de las Conquistas",
       "genero": "Acción",
       "capitulos": 15,
@@ -607,7 +594,7 @@ const EMBEDDED_CONFIG = {
       "descripcion": "En esta apasionante producción, nos adentramos en el corazón del Imperio otomano, en una época cargada de conquistas y luchas por la justicia, para ser testigos del viaje triunfal del joven sultán Mehmed II, cuya inteligencia y valentía lo guiarán en su camino hacia la grandeza.",
       "pais": "Turquía",
       "imagen": "https://f005.backblazeb2.com/file/tvalacartaplus/tvalacartaplus/Mehmed+Sultan+of+Conquests+2.jpg",
-      "estado": "transmision",
+      "estado": "finalizada",
       "id": 1760128599656,
       "createdAt": "2025-10-10T20:36:39.656Z",
       "updatedAt": "2025-10-12T01:05:32.420Z"
@@ -650,6 +637,19 @@ const EMBEDDED_CONFIG = {
       "id": 1760239390038,
       "createdAt": "2025-10-12T03:23:10.038Z",
       "updatedAt": "2025-10-12T03:23:10.038Z"
+    },
+    {
+      "titulo": "Dinastia Casillas",
+      "genero": "Acción",
+      "capitulos": 6,
+      "año": 2025,
+      "descripcion": "Tras la misteriosa desaparición de Aurelio, Ismael Casillas se ve obligado a enfrentar una despiadada batalla por el legado y la familia. Proteger a los suyos le exige alianzas y sacrificios.",
+      "pais": "Estados Unidos",
+      "imagen": "https://f005.backblazeb2.com/file/tvalacartaplus/tvalacartaplus/Dinastia+casilla.jpg",
+      "estado": "transmision",
+      "id": 1760601934996,
+      "createdAt": "2025-10-16T08:05:34.996Z",
+      "updatedAt": "2025-10-16T08:05:34.996Z"
     }
   ],
   "settings": {
